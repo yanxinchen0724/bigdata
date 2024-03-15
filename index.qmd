@@ -1,0 +1,55 @@
+# CASA00025 Group Project Title Here
+
+## Project Summary 
+
+Fill in the sections below to provide a brief summary of your project. Each section should have no more than 100 words. Do not edit any of the headings.
+
+### Problem Statement 
+
+What is the problem you’re trying to address using this application? 
+
+### End User 
+
+Who are you building this application for? How does it address a need this community has?
+
+### Data
+
+What data are you using? 
+
+### Methodology
+
+How are you using this data to address the problem?
+
+### Interface
+
+How does your application's interface work to address the needs of your end user?
+
+## The Application 
+
+Replace the link below with the link to your application.
+
+:::{.column-page}
+
+<iframe src='https://ollielballinger.users.earthengine.app/view/turkey-earthquake' width='100%' height='700px'></iframe>
+
+:::
+## How it Works 
+
+Use this section to explain how your application works using code blocks and text explanations (no more than 500 words excluding code):
+
+```js
+Map.setCenter(35.51898, 33.90153, 15);
+
+Map.setOptions("satellite");
+
+var aoi = ee.Geometry.Point(35.51898, 33.90153).buffer(3000);
+```
+
+You can include images:
+
+![Pixelwise T-Test, 2018](images/beirut_change_2020.jpg)
+
+and math:
+$$ \Large t = {\frac{\overline{x_1}-\overline{x_2}} {\sqrt{\frac{s^2_1}{n_1} + \frac{s^2_2}{n_2}}}} $$
+
+
