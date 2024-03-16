@@ -1,28 +1,82 @@
-# CASA00025 Group Project Title Here
+# From Desert to Green: Analyzing the Process of China’s Three-North Shelter Forest Program 
 
 ## Project Summary 
 
-Fill in the sections below to provide a brief summary of your project. Each section should have no more than 100 words. Do not edit any of the headings.
-
-### Problem Statement 
-
-What is the problem you’re trying to address using this application? 
+This project analyzes the afforestation results of China's Three North Protective Forest Program 
+to show the results of desertification reversal. Using high-resolution satellite data and random
+forest algorithms, the project tracks the greening process in depth, provides urban planners and 
+environmentalists with accurate trend analysis, and visualizes the expansion of green space and 
+ecological improvement.
 
 ### End User 
 
-Who are you building this application for? How does it address a need this community has?
+Primarily for urban planners, environmental organizations, policy makers, and the public 
+interested in greening change. Provides these users with detailed trends in de-desertification 
+change
 
 ### Data
 
-What data are you using? 
+1. High-resolution multispectral imaging data from Sentinel-2.
+2. Validation in conjunction with project-specific reports and statistics from the China 
+Forestry Administration.
 
 ### Methodology
 
-How are you using this data to address the problem?
+Specifically, a random forest algorithm is used to identify desert and greenfield cover to track 
+and analyze the change process in a time series. This will involve training classifiers using 
+labeled satellite imagery and cross-validating the models to ensure accuracy.
+
+1. Selection and preparation of the dataset
+Selection of satellite imagery: firstly, a suitable satellite image dataset needs to be selected 
+from the GEE data catalogue. For greenfield analysis, images from the Sentinel-2 or Landsat 
+series are good choices because they provide high-resolution and multispectral information 
+suitable for identifying vegetation. And it is important to determine the time frame and 
+geographic scope of the analysis. By setting specific dates and regions, the amount of data 
+processed can be reduced and processing speed increased.
+2. Pre-processing data
+Data Cleaning: Handles cloud cover and other factors that may affect image quality. gee 
+provides a variety of tools and algorithms to automatically detect and remove cloud cover.
+Feature Selection: Based on multispectral images, select bands and indices such as 
+Normalised Vegetation Index (NDVI) that are helpful in distinguishing greenfield and 
+non-greenfield areas.
+3. Training data preparation
+Collecting training samples: using the interactive map tool of GEE, manually select sample 
+areas of greenfield and non-greenfield areas. These samples will be used to train the 
+random forest model.
+Extraction of eigenvalues: Extract eigenvalues from the selected sample areas, including 
+spectral values of the selected bands and other possible vegetation indices.
+4. Training with Random Forest
+Define the model: define a random forest classifier in GEE and set appropriate parameters 
+such as the number and depth of trees.
+Train the model: train the model using the prepared training dataset.GEE will handle the 
+training process of the model and give a trained classifier.
+5. Apply the model and analyse the results
+Classification full map: classify the image data of the whole study area using the trained 
+random forest model and get the probability of each pixel belonging to green or non-green 
+area
 
 ### Interface
 
-How does your application's interface work to address the needs of your end user?
+1. Introduction of the application(including background, policy, reference, and etc.)
+![pic1](D:/Big Data/GroupProject/bigdata/proposal pic/1.png)
+
+2. Map ：Comparing the coverage of green space and desert in different year/area
+![pic2](D:/Big Data/GroupProject/bigdata/proposal pic/2.png)
+
+3. Analysis: Create trend graphs of forest coverage rate and total area changes on an annual 
+basis.
+![pic3](D:/Big Data/GroupProject/bigdata/proposal pic/3.png)
+![pic4](D:/Big Data/GroupProject/bigdata/proposal pic/4.png)
+
+4. Layers： Year/ coverage of green space and desert.
+![pic5](D:/Big Data/GroupProject/bigdata/proposal pic/5.png)
+
+5. Legend: desert - wasteland – forest ( classified by different density or related value)
+![pic6](D:/Big Data/GroupProject/bigdata/proposal pic/6.png)
+
+6. Interative experience
+6.1 Custom target information
+![pic7](D:/Big Data/GroupProject/bigdata/proposal pic/7.png)
 
 ## The Application 
 
