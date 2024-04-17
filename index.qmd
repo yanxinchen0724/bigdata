@@ -1,59 +1,68 @@
-# From Desert to Green: Analyzing the Process of China’s Three-North Shelter Forest Program 
+---
+title: 'From Desert to Green: Analyzing the Process of China’s Three-North Shelter Forest Program'
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.15.2
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
 
 ## Project Summary 
 
-This project analyzes the afforestation results of China's Three North Protective Forest Program 
-to show the results of desertification reversal. Using high-resolution satellite data and random
-forest algorithms, the project tracks the greening process in depth, provides urban planners and 
-environmentalists with accurate trend analysis, and visualizes the expansion of green space and 
-ecological improvement.
+The primary objective of this project is to utilize Google Earth Engine (GEE) to identify potential locations for solar panel installations in Ningxia, China. 
+By analyzing high-resolution Sentinel-2 satellite imagery, the project focuses on classifying land covers with suitable conditions for solar energy production. 
+This initiative supports renewable energy goals, aids in the strategic placement of solar panels, and promotes sustainable development practices.
 
-### End User 
 
-Primarily for urban planners, environmental organizations, policy makers, and the public 
-interested in greening change. Provides these users with detailed trends in de-desertification 
-change
+
+### End User The primary end users are renewable energy companies, government agencies involved in energy and environmental planning, and researchers 
+studying the adoption and impact of renewable energy technologies. These users can leverage the detailed mapping of solar installations 
+to optimize the management and development of solar energy resources.ge
 
 ### Data
 
-1. High-resolution multispectral imaging data from Sentinel-2.
-2. Validation in conjunction with project-specific reports and statistics from the China 
-Forestry Administration.
+ Sentinel-2 ImageCollection: High-resolution multi-spectral images that provide detailed information on surface materials and vegetation, critical for distinguishing solar panels.2.
+2SRTM Digital Elevation Model (DEM): Elevation data to help identify and exclude unsuitable areas for solar panels based on terrain steepness.n.
 
-### Methodology
+### Methodology1. Data Acquisition and Preparation
+The Sentinel-2 satellite imagery is chosen due to its high spatial resolution and spectral coverage. The images are filtered to include only those with less than 10% cloud cover, ensuring clarity and reliability of the data. This process also involves setting the temporal scope of the images (from April to July 2022) to capture the vegetation and land conditions during a specific season.
 
-Specifically, a random forest algorithm is used to identify desert and greenfield cover to track 
-and analyze the change process in a time series. This will involve training classifiers using 
-labeled satellite imagery and cross-validating the models to ensure accuracy.
+2. Spectral Band Selection
+The selected bands from Sentinel-2 include visible, near-infrared (NIR), and short-wave infrared (SWIR) frequencies. These bands are critical for calculating the indices used to evaluate land characteristics. Bands such as B4 (red) and B8 (NIR) are specifically used for NDVI calculations, which help distinguish vegetation from other types of land cover.
 
-1. Selection and preparation of the dataset
-Selection of satellite imagery: firstly, a suitable satellite image dataset needs to be selected 
-from the GEE data catalogue. For greenfield analysis, images from the Sentinel-2 or Landsat 
-series are good choices because they provide high-resolution and multispectral information 
-suitable for identifying vegetation. And it is important to determine the time frame and 
-geographic scope of the analysis. By setting specific dates and regions, the amount of data 
-processed can be reduced and processing speed increased.
-2. Pre-processing data
-Data Cleaning: Handles cloud cover and other factors that may affect image quality. gee 
-provides a variety of tools and algorithms to automatically detect and remove cloud cover.
-Feature Selection: Based on multispectral images, select bands and indices such as 
-Normalised Vegetation Index (NDVI) that are helpful in distinguishing greenfield and 
-non-greenfield areas.
-3. Training data preparation
-Collecting training samples: using the interactive map tool of GEE, manually select sample 
-areas of greenfield and non-greenfield areas. These samples will be used to train the 
-random forest model.
-Extraction of eigenvalues: Extract eigenvalues from the selected sample areas, including 
-spectral values of the selected bands and other possible vegetation indices.
-4. Training with Random Forest
-Define the model: define a random forest classifier in GEE and set appropriate parameters 
-such as the number and depth of trees.
-Train the model: train the model using the prepared training dataset.GEE will handle the 
-training process of the model and give a trained classifier.
-5. Apply the model and analyse the results
-Classification full map: classify the image data of the whole study area using the trained 
-random forest model and get the probability of each pixel belonging to green or non-green 
-area
+3. Index Calculation
+Three key indices are calculated:
+
+Normalized Difference Vegetation Index (NDVI): This index assesses vegetation health and density. For solar panel placement, areas with low NDVI are targeted, as they indicate lesser vegetation and potentially clear land for installation.
+Normalized Difference Water Index (NDWI): Used to identify and exclude water bodies, as placing solar panels on water (unless specifically designing floating solar farms) is not typically feasible.
+Normalized Difference Built-up Index (NDBI): Useful in identifying urbanized areas. Depending on the project’s criteria, these areas might be excluded due to the complex land ownership and higher value of urban land.
+4. Terrain Analysis
+The terrain is analyzed using the Shuttle Radar Topography Mission (SRTM) Digital Elevation Model to calculate the slope of the land. Steep slopes are generally unsuitable for solar panel installations due to construction difficulties and efficiency concerns. A threshold (e.g., 10 degrees) is set to exclude such areas.
+
+5. Data Masking and Filtering
+Using the calculated indices and the slope information, a mask is created to exclude areas that are not suitable for solar panels. This mask is applied to the satellite imagery, filtering out high vegetation areas, water bodies, urbanized areas, and steep terrains.
+
+6. Feature Engineering and Sample Collection
+Random points are generated within the areas deemed suitable for further analysis. These points are labeled based on their land cover type, derived from the indices and visual inspection, creating a dataset for training the machine learning model.
+
+7. Machine Learning: Classification
+A random forest classifier is trained on the labeled dataset. The classifier uses features such as the spectral bands and the indices values to differentiate between potential and non-potential sites for solar panels. The number of trees and other hyperparameters in the random forest are chosen to optimize accuracy and prevent overfitting.
+
+8. Model Validation and Accuracy Assessment
+The trained model is then applied to a separate validation dataset to classify the land cover. Validation metrics, such as the confusion matrix, overall accuracy, kappa coefficient, producer's accuracy, and user's accuracy, are computed. These metrics assess how well the model performs and ensure reliability in real-world applications.
+
+9. Visualization and Implementation
+The final classified image, highlighting potential sites for solar panel installations, is visualized on the GEE interface. This map can be used by decision-makers to visually assess potential sites and plan further ground-truthing or development activities.
+
+This methodology integrates advanced remote sensing techniques and machine learning within a robust computational framework, offering a scalable and efficient solution to identifying potential sites for re
+newable energy infrastructure.a
 
 ### Interface
 
@@ -105,5 +114,4 @@ You can include images:
 
 and math:
 $$ \Large t = {\frac{\overline{x_1}-\overline{x_2}} {\sqrt{\frac{s^2_1}{n_1} + \frac{s^2_2}{n_2}}}} $$
-
 
