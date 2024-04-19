@@ -1,5 +1,5 @@
 ---
-title: 'From Desert to Green: Analyzing the Process of China’s Three-North Shelter Forest Program'
+title: 'SolarScape: Harnessing Satellite Insights for Sustainable Solar Deployment in Ningxia'
 jupyter:
   jupytext:
     text_representation:
@@ -28,8 +28,10 @@ to optimize the management and development of solar energy resources.ge
 
 ### Data
 
- Sentinel-2 ImageCollection: High-resolution multi-spectral images that provide detailed information on surface materials and vegetation, critical for distinguishing solar panels.2.
-2SRTM Digital Elevation Model (DEM): Elevation data to help identify and exclude unsuitable areas for solar panels based on terrain steepness.n.
+Sentinel-2 ImageCollection: High-resolution multi-spectral images that provide detailed information on surface materials and vegetation, critical for distinguishing solar panels. 
+
+SRTM Digital Elevation Model (DEM): Elevation data to help identify and exclude unsuitable areas for solar panels based on terrain steepness. (Available at: https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003 )
+
 
 ### Methodology1. Data Acquisition and Preparation
 The Sentinel-2 satellite imagery is chosen due to its high spatial resolution and spectral coverage. The images are filtered to include only those with less than 10% cloud cover, ensuring clarity and reliability of the data. This process also involves setting the temporal scope of the images (from April to July 2022) to capture the vegetation and land conditions during a specific season.
