@@ -1,3 +1,7 @@
+//---Pre_processing-----
+Map.addLayer(importedAsset1, {color: 'red'}, 'Imported Data1');
+  
+
 // Set the map center to a location in Ningxia
 Map.setCenter(106.253352, 38.461084, 9); 
 
@@ -12,7 +16,7 @@ var bands = ['B2', 'B3', 'B4','B5','B6','B7','B8', 'B8A','B11','B12'];
 var sentinel = ee.ImageCollection('COPERNICUS/S2_SR')
                   .filterBounds(AOI)
                   .filter(ee.Filter.date(start, end))
-                  .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 10))
+                  .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 1))
                   .mean()
                   .select(bands);
                   
@@ -38,7 +42,7 @@ var ndbi = sentinel.normalizedDifference(['B11', 'B8']).rename('ndbi').clip(AOI)
 var ndbiThreshold = 0.1;
 
 // Use the NDBI threshold to mask urban areas
-var nonUrbanImage = sentinel.updateMask(ndbi.lt(ndbiThreshold));
+
 
 // Update mask based on NDWI and NDVI thresholds and add NDVI band
 var image = sentinel.updateMask(ndwi.lt(0.3)).updateMask(ndvi.lt(0.2)).addBands(ndvi);
@@ -109,9 +113,9 @@ var validation = image.sampleRegions({
 
 // Train a random forest classifier
 var model = ee.Classifier.smileRandomForest({
-  numberOfTrees: 500,
+  numberOfTrees:700, //improve stability. If computation resources are limited, consider fewer trees.
   variablesPerSplit: null,
-  minLeafPopulation: 1,
+  minLeafPopulation: 5, //Set a higher value (like 2-5) to avoid overfitting by limiting tree depth
   bagFraction: 0.5,
   maxNodes: null
 }).train({
@@ -129,20 +133,56 @@ var solar = prediction.updateMask(prediction.eq(0));
 // Add the solar prediction layer to the map
 Map.addLayer(solar.clip(AOI), {palette: 'red'}, 'Predicted Solar Panels',false, 0.5);
 
-//validation
+/* To export the classifer, please use the following code:
+Export.classifier.toAsset({
+  classifier: model,
+  description: 'exported_19_23',
+  assetId: 'projects/ee-hnyhl3/assets/classifier2019'
+});
+*/
+
+//Create a mask for Class 0 and display it
+var class0Mask = solar.eq(0).selfMask(); //Use selfMask to ensure only Class 0 is displayed
+Map.addLayer(class0Mask, {palette: ['FF0000']}, 'Predicted Class 0');
+
+//Use a circular kernel
+var kernel = ee.Kernel.circle({
+  radius: 10,
+  units: 'pixels',
+  normalize: false  // Set to not normalize
+});
+
+var densityThreshold = 45;  //May need further adjustment based on actual conditions
+
+var density = class0Mask.reduceNeighborhood({
+  reducer: ee.Reducer.sum(),
+  kernel: kernel
+});
+
+
+//Filter pixels based on density threshold
+var filteredByDensity = density.gte(densityThreshold);
+var finalMask = class0Mask.updateMask(filteredByDensity);
+
+//Add the processed layer to the map
+Map.addLayer(finalMask, {palette: ['0000FF']}, 'Density Filtered Class 0');
+
+
+// Export the image to Earth Engine asset
+Export.image.toAsset({
+  image: finalMask.clip(AOI),
+  description: 'Exported_Image_Asset_Ningxia',
+  assetId: 'projects/ee-hnyhl3/assets/Image_2022',
+  scale: 30,
+  region: AOI,
+  maxPixels: 1e9
+});
+
+//-----Validation-----
+
 var validated = validation.classify(model);
 var testAccuracy = validated.errorMatrix('class', 'classification');
-var kappa = testAccuracy.kappa();
-var producersAccuracy = testAccuracy.producersAccuracy();
-var usersAccuracy = testAccuracy.consumersAccuracy();
- 
- 
+
 print('Confusion Matrix ', testAccuracy);
- 
+
 print('Validation overall accuracy: ', testAccuracy.accuracy())
-
-print('Kappa Coefficient:', kappa)
-
-print('Producer\'s Accuracy:', producersAccuracy)
-
-print('User\'s Accuracy:', usersAccuracy);
