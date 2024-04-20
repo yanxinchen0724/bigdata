@@ -35,47 +35,9 @@ SRTM Digital Elevation Model (DEM): Elevation data to help identify and exclude 
 
 
 ### Methodolo1. Data Acquisition and Preparation
-The Sentinel-2 satellite imagery is chosen due to its high spatial resolution and spectral coverage. The images are filtered to include only those with less than 10% cloud cover, ensuring clarity and reliability of the data. This process also involves setting the temporal scope of the images (from April to July each year) to capture the vegetation and land conditions during a specific season.
 
-2. Spectral Band Selection
-The selected bands from Sentinel-2 include visible, near-infrared (NIR), and short-wave infrared (SWIR) frequencies. These bands are critical for calculating the indices used to evaluate land characteristics. Bands such as B4 (red) and B8 (NIR) are specifically used for NDVI calculations, which help distinguish vegetation from other types of land cover.
+The project utilizes Sentinel-2 satellite imagery, selected for its high resolution and broad spectral range, filtering images with under 10% cloud cover for optimal clarity. It focuses on visible, NIR, and SWIR bands crucial for deriving indices like NDVI, NDWI, and NDBI, which identify suitable areas for solar installations by assessing vegetation, water, and urbanization. The terrain is analyzed using SRTM data to exclude steep slopes. A combination of these indices and terrain data helps create a mask to filter out unsuitable areas. Random points are generated and labeled for training a Random Forest classifier, which is validated by metrics like overall accuracy and Kappa to ensure robust model performance.
 
-3. Index Calculation
-
-Normalized Difference Vegetation Index (NDVI): This index assesses vegetation health and density (Dodd, Hirons and Puértolas, 2023). For solar panel placement, areas with low NDVI are targeted, as they indicate lesser vegetation and potentially clear land for installation.
-
-Normalized Difference Water Index (NDWI): Used to identify and exclude water bodies (McFEETERS, 1996), as placing solar panels on water (unless specifically designing floating solar farms) is not typically feasible in this inland region.
-
-Normalized Difference Built-up Index (NDBI): Useful in identifying urbanized areas (Zha, Gao and Ni, 2010). Depending on the project’s criteria, these areas might be excluded due to the complex land ownership and higher value of urban land.
-
-4. Terrain Analysis
-The terrain is analyzed using the Shuttle Radar Topography Mission (SRTM) Digital Elevation Model to calculate the slope of the land (Rodríguez, Morris and Belz, 2006). Steep slopes are generally unsuitable for solar panel installations due to construction difficulties and efficiency concerns. A threshold is set to exclude such areas. 
-
-5. Data Masking and Filtering
-Using the calculated indices and the slope information, a mask is created to exclude areas that are not suitable for solar panels. This mask is applied to the satellite imagery, filtering out high vegetation areas, water bodies, urbanized areas, and steep terrains.
-
-6. Feature Engineering and Sample Collection
-Random points are generated within the areas deemed suitable (geometry) for further analysis. These points are labeled based on their land cover type, derived from the indices and visual inspection, creating a dataset for training the machine learning model.
-
-7. Machine Learning: Classification
-The Random Forest (RF) classifier, known for its high accuracy, efficiency, and consistency, utilizes multiple decision trees as part of an ensemble model to perform classification or regression tasks (Belgiu and Drăguţ, 2016). A random forest classifier is trained on the labeled dataset. The classifier uses features such as the spectral bands and the indices values to differentiate between potential and non-potential sites for solar panels. The number of trees and other hyperparameters in the random forest are chosen to optimize accuracy and prevent overfitting.
-
-8. Model Validation and Accuracy Assessment
-The trained model is then applied to a separate validation dataset to classify the land cover. The confusion matrix, overall accuracy, kappa coefficient are computed. These metrics assess how well the model performs and ensure reliability in real-world applications. An overall accuracy exceeding 70% is deemed acceptable, while a Kappa value between 0.40 and 0.85 indicates good ag
-Reference List:
-Belgiu, M. and Drăguţ, L. (2016). Random forest in remote sensing: A review of applications and future directions. ISPRS Journal of Photogrammetry and Remote Sensing, [online] 114(114), pp.24–31. doi:https://doi.org/10.1016/j.isprsjprs.2016.01.011.
-
-Congalton, R.G. (1991). A review of assessing the accuracy of classifications of remotely sensed data. Remote Sensing of Environment, 37(1), pp.35–46. doi:https://doi.org/10.1016/0034-4257(91)90048-b
-.
-Dodd, I.C., Hirons, A.D. and Puértolas, J. (2023). Plant-water relations. In: M.J. Goss and M. Oliver, eds., Encyclopedia of Soils in the Environment. Elsevier BV, pp.516–526. doi:https://doi.org/10.1016/b978-0-12-822974-3.00253-
-6.
-McFEETERS, S.K. (1996). The use of the Normalized Difference Water Index (NDWI) in the delineation of open water features. International Journal of Remote Sensing, 17(7), pp.1425–1432. doi:https://doi.org/10.1080/014311696089487
-14.
-Rodríguez, E., Morris, C.S. and Belz, J.E. (2006). A Global Assessment of the SRTM Performance. Photogrammetric Engineering & Remote Sensing, [online] 72(3), pp.249–260. doi:https://doi.org/10.14358/PERS.72.3.
-249.
-Zha, Y., Gao, J. and Ni, S. (2010). Use of normalized difference built-up index in automatically mapping urban areas from TM imagery. International Journal of Remote Sensing, 24(3), pp.583–594. doi:https://doi.org/10.1080/01431160304987.
-reement (Congalton, 1991).
-e.a
 
 ### Interface
 
