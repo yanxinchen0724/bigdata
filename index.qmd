@@ -19,11 +19,23 @@ Fill in the sections below to provide a brief summary of your project. Each sect
 
 ### Problem Statement 
 
-We developed the app to educate and popularize science, aiming to raise public awareness of the construction and development of photovoltaic (PV) power plants in the Ningxia region. This area has unique advantages for developing the PV industry, such as high altitude, ample land, abundant sunlight, and a sparse population. Although many PV power plants are operational, there's a need for a platform that visualizes their exact locations and sizes. Our goal is to create an app that integrates data visualization, interactive features, and relevant environmental factors to showcase the construction outcomes of PV power plants in various municipalities in Ningxia, promoting the adoption of PV energy.
+We developed the app to educate and popularize science, aiming to raise public awareness of the construction and development of photovoltaic (PV) power plants in the Ningxia region. 
+
+This area has unique advantages for developing the PV industry, such as high altitude, ample land, abundant sunlight, and a sparse population. Although many PV power plants are operational, 
+
+there's a need for a platform that visualizes their exact locations and sizes. Our goal is to create an app that integrates data visualization, 
+
+interactive features, and relevant environmental factors to showcase the construction outcomes of PV power plants in various municipalities in Ningxia, promoting the adoption of PV energy.
 
 ### End User 
 
-We are building this application for the general public, student groups, and individuals interested in renewable energy, with a focus on those visiting urban planning exhibition halls. It addresses the community's need for accessible information about photovoltaic (PV) power plants in the Ningxia region, which has unique advantages for PV development. By providing a platform to visualize the exact locations, development processes, and environmental factors of these PV projects, the app fosters a better understanding of renewable energy. It supports educational activities and interactive learning, thereby increasing public awareness and support for PV energy.
+We are building this application for the general public, student groups, and individuals interested in renewable energy, with a focus on those visiting urban planning exhibition halls. 
+
+It addresses the community's need for accessible information about photovoltaic (PV) power plants in the Ningxia region, which has unique advantages for PV development. 
+
+By providing a platform to visualize the exact locations, development processes, and environmental factors of these PV projects, the app fosters a better understanding of renewable energy. 
+
+It supports educational activities and interactive learning, thereby increasing public awareness and support for PV energy.
 
 ### Data
 
@@ -36,7 +48,13 @@ NingXia Administrative shapefile from Ningxia Platform for Common Geospatial Inf
 
 ### Methodology
 
-We use Sentinel-2 satellite imagery, filtered to ensure less than 10% cloud cover, for its high resolution and broad spectral range. By focusing on specific bands (visible, NIR, SWIR), we derive key indices like NDVI, NDWI, and NDBI, to  filter out vegetation, water and urban area. We also use SRTM data to assess terrain, excluding steep slopes. This combination creates a comprehensive mask to filter out unsuitable areas. Random points within suitable regions are used to train a Random Forest classifier, validated with metrics like overall accuracy and confusion matrices for robust performance.
+We use Sentinel-2 satellite imagery, filtered to ensure less than 10% cloud cover, for its high resolution and broad spectral range. 
+
+By focusing on specific bands (visible, NIR, SWIR), we derive key indices like NDVI, NDWI, and NDBI, to  filter out vegetation, water and urban area. 
+
+We also use SRTM data to assess terrain, excluding steep slopes. This combination creates a comprehensive mask to filter out unsuitable areas. 
+
+Random points within suitable regions are used to train a Random Forest classifier, validated with metrics like overall accuracy and confusion matrices for robust performance.
 
 ### Interface
 
@@ -182,6 +200,7 @@ var density = class0Mask.reduceNeighborhood({
 ```
 
 ### VisualizThe application has two main panels. The left panel is the information panel, and the right panel is the map panel, 
+
 where map layers and legends can be loaded. The initial loading process is as follows:加载过程如下：
 
 ```js
@@ -238,8 +257,10 @@ home();
 ```
 1. Left Panel
 
-(1) Line chart showing year-over-year changes in the total area of photovoltaic power stations in Ningxia.
+(1) Line chart showing year-over-year changes in the total area of photovoltaic power stations in Ningxia
+.
 This line chart is created by importing precomputed area data using the ui.Chart.feature.byFeature method
+
 . The horizontal axis represents years, while the vertical axis represents the are
 .、纵轴为面积值。
 ```js
@@ -269,7 +290,9 @@ function createLineChart() {
   return lineChart;
 }
 var lineChart = createLineChar((2) Yearly changes in the area of photovoltaic power stations in Ningxia's various municipal-level districts.
-Create a bar chart and embed it in the UI panel. This bar chart can display the area of photovoltaic power stations
+
+Create a bar chart and embed it in the UI panel. This bar chart can display the area of photovoltaic power station
+
  in five different districts for a specific year份的光伏发电站面积。
 ```js
 // District names as categories
@@ -311,8 +334,11 @@ var chart1_Panel = ui.Panel({
 定年份的图像和图表。
 (4) Associated Influence Factors Map:
 
-（4）相关影响因素(5) Navigation Buttons: Includes the "Comparison View" button and the "Main View" button.对比Comparison View Button
-Defines a button called comparison_view_button. When clicked, it hides the current legend panel and map panel, then calls the createOrUpdateDualMapPanels function. This function switches the interface to a comparison view of the map panels.跳转到对比视图地图面板.
+（4）相关影响因素(5) Navigation Buttons: Includes the "Comparison View" button and the "Main View" button.对比**Comparison View Button**
+
+Defines a button called comparison_view_button. When clicked, it hides the current legend panel and map panel,
+
+ then calls the createOrUpdateDualMapPanels function. This function switches the interface to a comparison view of the map panels.跳转到对比视图地图面板.
 
 ```js
 var dualMapPanelsCreated = false;
@@ -323,8 +349,12 @@ var comparison_view_button = ui.Button({
     legendPanel.style().set('shown', false);
     mapPanel.style().set('shown', false);
     createOrUpdateDualMapPanels();
-Main View Button
-When clicked, this button shows the map panel, custom area panel, and legend panel. It allows users to return from the comparison view to the main interface,
+**Main View Button**
+
+When clicked, this button shows the map panel, custom area panel, and legend panel.
+
+ It allows users to return from the comparison view to the main interface,
+
  reverting to a single map view with other interface elements.一地图视图和其它界面元素。
 ```js
 var main_interface_button = ui.Button({
@@ -338,7 +368,8 @@ var main_interface_button = ui.Button({
   }
 });2. Right-Side Map Panel
 
-(1) Main View Map Panel
+(1) Main View Map Pane
+l
 Highlights area boundaries.图地图面板
 高亮显示区域边界
 
@@ -389,9 +420,13 @@ Highlights area boundaries.图地图面板
         updateInfoPanel('Unknown Area');
       }
     Pop-Up Information Panel for a Specified Area
+
 This code snippet creates and updates an information panel to display detailed information when the user clicks on a region on the map.
+
  The panel's style is set (e.g., size, transparency), and the information is updated based on the user's selection on the map.
+
  It also handles unexpected cases when the selected region is out of scope. The information panel displays the district name, area, and unit density.
+
  Each label's value is set using the.setValue method, with dynamic generation based on function parameters and data
 .是基于函数参数和数据动态生成的。
 ```js
@@ -418,7 +453,9 @@ function updateInfoPanel(currentSelectedYear, districtName) {
    
     infoPanel.add(ui.Label('District: ', boldStyle).setValue('District: ' + districtName));
     infoPanel.add(ui.Label('Area: ', boldStyle).setValue('Area: ' + regionData.area + ' km²'));
-    infoPanel.add(ui.Label('Density: ', boldStyle).setValue('Density: ' + regionData.density(2) Comparison View Map Panel: Like the main map, this panel allows users to switch between layers for different years, enabling comparison from various perspectives.
+    infoPanel.add(ui.Label('Density: ', boldStyle).setValue('Density: ' + regionData.density(2) Comparison View Map Panel: Like the main map, this panel allows users to switch between layers for different years, 
+
+enabling comparison from various perspectives.
 
 Creating the Comparison View
 便用户对比不同视角
