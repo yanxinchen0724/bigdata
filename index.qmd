@@ -15,7 +15,6 @@ jupyter:
 
 ## Project Summary 
 
-Fill in the sections below to provide a brief summary of your project. Each section should have no more than 100 words. Do not edit any of the headings.
 
 ### Problem Statement 
 
@@ -39,21 +38,29 @@ It supports educational activities and interactive learning, thereby increasing 
 
 ### Data
 
-Sentinel-2 ImageCollection: High-resolution multi-spectral images that provide detailed information on surface materials and vegetation, critical for distinguishing solar panels. 
+1.Sentinel-2 ImageCollection: High-resolution multi-spectral images that provide detailed information on surface materials and vegetation, critical for distinguishing solar panels. 
 
-SRTM Digital Elevation Model (DEM): Elevation data to help identify and exclude unsuitable areas for solar panels based on terrain steepness ([Available Here](https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003) )
+2.SRTM Digital Elevation Model (DEM): Elevation data to help identify and exclude unsuitable areas for solar panels based on terrain steepness ([Available Here](https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003) )
 
-NingXia Administrative shapefile from Ningxia Platform for Common Geospatial Information Services ([Available Here](https://ningxia.tianditu.gov.cn/))
+3.NingXia Administrative shapefile from Ningxia Platform for Common Geospatial Information Services ([Available Here](https://ningxia.tianditu.gov.cn/))
+
+4.MERRA-2 M2T1NXRAD: Radiation Diagnostics V5.12.4
+
+5.Sentinel-5P OFFL CO: Offline Carbon Monoxide
+
+6.Sentinel-5P OFFL NO2: Offline Nitrogen Dioxide
+
+7.Sentinel-5P OFFL SO2: Offline Sulfur Dioxide
+
+8.MOD21A1D.061 Terra Land Surface Temperature and 3-Band Emissivity Daily Global 1km
+
 
 
 ### Methodology
 
 We use Sentinel-2 satellite imagery, filtered to ensure less than 10% cloud cover, for its high resolution and broad spectral range. 
-
 By focusing on specific bands (visible, NIR, SWIR), we derive key indices like NDVI, NDWI, and NDBI, to  filter out vegetation, water and urban area. 
-
-We also use SRTM data to assess terrain, excluding steep slopes. This combination creates a comprehensive mask to filter out unsuitable areas. 
-
+We also use Shuttle Radar Topography Mission (SRTM) data to assess terrain, excluding steep slopes. This combination creates a comprehensive mask to filter out unsuitable areas. 
 Random points within suitable regions are used to train a Random Forest classifier, validated with metrics like overall accuracy and confusion matrices for robust performance.
 
 ### Interface
@@ -69,6 +76,7 @@ Divide into the left and right interfaces. Users can customise the years and sel
 3. Data visualization interface: 
 Include the title and introduction of the app, present the changing trend of Ningxia PV Station and related factors (Surface Radiation and Land Surface Temperature) in the past five years through charts, and ranks and values distinguished by city and district.
 ![pic3](D:/Big Data/GroupProject/bigdata/proposal pic/3.png)
+
 
 ## The Application 
 
@@ -372,9 +380,10 @@ function updateLayerMain(year) {
 ```
 
 (4) Associated Influence Factors Map:
+
 The format of the chart is set here, the data is sorted from large to small according to the year, and then the corresponding bar chart 
 with different lengths is generated to show the difference between the data. At the end, the complete bar chart is generated, given different
- colors, and displayed horizontally on the interface.
+colors, and displayed horizontally on the interface.
 
 ```js
 var statsLabelStyle = {fontWeight: 'bold', fontSize: '16px', margin: '10px 0 0 0'};
@@ -427,6 +436,7 @@ years.forEach(function(year) {
 (5) Navigation Buttons: Includes the "Comparison View" button and the "Main View" button.
 
 Comparison View Button：
+
 Defines a button called comparison_view_button. When clicked, it hides the current legend panel and map panel, then calls the 
 createOrUpdateDualMapPanels function. This function switches the interface to a comparison view of the map panels.
 
@@ -461,7 +471,9 @@ var main_interface_button = ui.Button({
 ```
 
 #### 2. Right-Side Map Panel
+
 (1) Main View Map Panel
+
 Highlights area：attaches a click event handler to a map to highlight regions and display an information panel. It updates or creates a highlight 
 layer based on user clicks and populates the panel with region details or handles cases where no region is clicked.
 
@@ -565,7 +577,7 @@ var rightyearSelect = ui.Select({
   }
 });
 ```
-
+```js
 // Create a panel for the dropdown menu
 var rightyearSelectPanel = ui.Panel({
   widgets: [rightyearSelect],
@@ -587,9 +599,11 @@ var right_legend_Panel = ui.Panel({
 });
 ```
 
-Synchronized Zoom and Movement
+Synchronized Zoom and Movement:
+
 Sets up synchronized dual map panels if not already created, configuring shared zoom levels and center positions between two maps
 for cohesive viewing. It initializes map settings and controls visibility.
+
 
 ```js
 function createOrUpdateDualMapPanels() {
@@ -635,9 +649,5 @@ function syncZoom(map1, map2) {
 // Function to synchronize the center position between two maps
 function syncCenter(map1, map2) {
   return function(center) {
-    map2.setCenter(center);
-  };
-}
-````
-
+    map2.setCenter(cente2_2}{n_2}}}} $$
 
