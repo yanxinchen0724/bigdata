@@ -3,6 +3,9 @@
 // Set the map center to a location in Ningxia
 Map.setCenter(106.253352, 38.461084, 9); 
 
+//Import the layer used to assist manual labeling
+var importedAsset1 = ee.FeatureCollection('projects/ee-hnyhl3/assets/China_PV_training_polygon_2020');
+Map.addLayer(importedAsset1, {color: 'FF0000'}, 'Imported Data1');
 
 // Define the start and end dates
 var start = '2022-04-01';
