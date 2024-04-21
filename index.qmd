@@ -58,26 +58,17 @@ Random points within suitable regions are used to train a Random Forest classifi
 
 ### Interface
 
-1. Introduction of the application(including background, policy, reference, and etc.)
+1. Main view: 
+Display information based on the latest data. Users can select each layer and adjust the transparency in the Layers section to customise the information they want to present.
 ![pic1](D:/Big Data/GroupProject/bigdata/proposal pic/1.png)
 
-2. Map ：Comparing the coverage of green space and desert in different year/area
+2. Comparison view: 
+Divide into the left and right interfaces. Users can customise the years and select layers to view the information for comparison.
 ![pic2](D:/Big Data/GroupProject/bigdata/proposal pic/2.png)
 
-3. Analysis: Create trend graphs of forest coverage rate and total area changes on an annual 
-basis.
+3. Data visualization interface: 
+Include the title and introduction of the app, present the changing trend of Ningxia PV Station and related factors (Surface Radiation and Land Surface Temperature) in the past five years through charts, and ranks and values distinguished by city and district.
 ![pic3](D:/Big Data/GroupProject/bigdata/proposal pic/3.png)
-![pic4](D:/Big Data/GroupProject/bigdata/proposal pic/4.png)
-
-4. Layers： Year/ coverage of green space and desert.
-![pic5](D:/Big Data/GroupProject/bigdata/proposal pic/5.png)
-
-5. Legend: desert - wasteland – forest ( classified by different density or related value)
-![pic6](D:/Big Data/GroupProject/bigdata/proposal pic/6.png)
-
-6. Interative experience
-6.1 Custom target information
-![pic7](D:/Big Data/GroupProject/bigdata/proposal pic/7.png)
 
 ## The Application 
 
