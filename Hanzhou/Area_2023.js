@@ -1,6 +1,6 @@
-//the source code is available at:https://code.earthengine.google.com/ca7277723e4bacec97cce61ea58dc57b
+//the source code is available at:https://code.earthengine.google.com/6d2c1fa25c109c1be1648ad7973ad1bf
 
-//-----Pre_Process-----
+//---Pre_processing-----
 // Set the map center to a location in Ningxia
 Map.setCenter(106.253352, 38.461084, 9); 
 
@@ -9,8 +9,8 @@ var importedAsset1 = ee.FeatureCollection('projects/ee-hnyhl3/assets/China_PV_tr
 Map.addLayer(importedAsset1, {color: 'FF0000'}, 'Imported Data1');
 
 // Define the start and end dates
-var start = '2020-04-01';
-var end = '2020-07-01';
+var start = '2023-04-01';
+var end = '2023-07-01';
 // Specify the bands of interest
 var bands = ['B2', 'B3', 'B4','B5','B6','B7','B8', 'B8A','B11','B12'];
 
@@ -42,6 +42,9 @@ var ndbi = sentinel.normalizedDifference(['B11', 'B8']).rename('ndbi').clip(AOI)
 
 // Set an NDBI threshold to identify urban areas (adjust based on your area of interest)
 var ndbiThreshold = 0.1;
+
+// Use the NDBI threshold to mask urban areas
+
 
 // Update mask based on NDWI and NDVI thresholds and add NDVI band
 var image = sentinel.updateMask(ndwi.lt(0.3)).updateMask(ndvi.lt(0.2)).addBands(ndvi);
@@ -151,12 +154,13 @@ var kernel = ee.Kernel.circle({
   normalize: false  // Set to not normalize
 });
 
-var densityThreshold = 45;  //May need further adjustment based on actual conditions
+var densityThreshold = 60;  //May need further adjustment based on actual conditions
 
 var density = class0Mask.reduceNeighborhood({
   reducer: ee.Reducer.sum(),
   kernel: kernel
 });
+
 
 //Filter pixels based on density threshold
 var filteredByDensity = density.gte(densityThreshold);
@@ -165,12 +169,11 @@ var finalMask = class0Mask.updateMask(filteredByDensity);
 //Add the processed layer to the map
 Map.addLayer(finalMask, {palette: ['0000FF']}, 'Density Filtered Class 0');
 
-
 // Export the image to Earth Engine asset
 Export.image.toAsset({
   image: finalMask.clip(AOI),
   description: 'Exported_Image_Asset_Ningxia',
-  assetId: 'projects/ee-hnyhl3/assets/Image_2020',
+  assetId: 'projects/ee-hnyhl3/assets/Image_2019',
   scale: 30,
   region: AOI,
   maxPixels: 1e9
@@ -185,6 +188,17 @@ print('Confusion Matrix ', testAccuracy);
 
 print('Validation overall accuracy: ', testAccuracy.accuracy())
 
+/*
+//optional validation methods:
+var kappa = testAccuracy.kappa();
+var producersAccuracy = testAccuracy.producersAccuracy();
+var usersAccuracy = testAccuracy.consumersAccuracy();
+
+print('Kappa Statistic:', kappa);
+print('Producer\'s Accuracy:', producersAccuracy);
+print('User\'s Accuracy', usersAccuracy)
+
+*/
 //-----Area Calculation by cities-----
 
 // Calculate the area of each pixel
@@ -202,8 +216,9 @@ var area = maskedArea.reduceRegion({
 //Convert shizuishan's area to square kilometers and output
 var areaInSquareKilometers1 = ee.Number(area.get('classification')).divide(1e6);
 areaInSquareKilometers1.evaluate(function(result) {
-  print('Area in shizuishan 2020:', result);
+  print('Area in shizuishan 2019:', result);
 });
+
 
 
 //Calculate the total area within yinchuan
@@ -217,7 +232,7 @@ var area = maskedArea.reduceRegion({
 // Convert area of yinchuan to square kilometers and output
 var areaInSquareKilometers2 = ee.Number(area.get('classification')).divide(1e6);
 areaInSquareKilometers2.evaluate(function(result) {
-  print('Area in yinchuan 2020:', result);
+  print('Area in yinchuan 2019:', result);
 });
 
 
@@ -232,7 +247,7 @@ var area = maskedArea.reduceRegion({
 // Convert area of wuzhong to square kilometers and output
 var areaInSquareKilometers3 = ee.Number(area.get('classification')).divide(1e6);
 areaInSquareKilometers3.evaluate(function(result) {
-  print('Area in wuzhong 2020:', result);
+  print('Area in wuzhong 2019:', result);
 });
 
 //Calculate the total area within zhongwei
@@ -246,7 +261,7 @@ var area = maskedArea.reduceRegion({
 //Convert area of zhongwei to square kilometers and output
 var areaInSquareKilometers4 = ee.Number(area.get('classification')).divide(1e6);
 areaInSquareKilometers4.evaluate(function(result) {
-  print('Area in zhongwei 2020:', result);
+  print('Area in zhongwei 2019:', result);
 });
 
 //Calculate the total area within guyuan
@@ -260,7 +275,7 @@ var area = maskedArea.reduceRegion({
 // Convert area of guyuan to square kilometers and output
 var areaInSquareKilometers5 = ee.Number(area.get('classification')).divide(1e6);
 areaInSquareKilometers5.evaluate(function(result) {
-  print('Area in guyuan 2020:', result);
+  print('Area in guyuan 2019:', result);
 });
 
 
@@ -286,8 +301,8 @@ Map.addLayer(class0Points, {color: '#3182bd'}, 'PV Stations');
 // Export the table to Google Earth Engine assets
 var exportParams = {
   collection: class0Points, 
-  description: 'point_2020', 
-  assetId: 'projects/ee-ucfnfou/assets/2021/Point_2020', 
+  description: 'point_2023', 
+  assetId: 'projects/ee-ucfnfou/assets/2021/Point_2023', 
 };
 
 
@@ -297,6 +312,7 @@ Export.table.toAsset(exportParams);
 
 var AOI = 
     /* color: #cee5ff */
+    /* shown: false */
     /* locked: true */
     ee.Geometry.Polygon(
         [[[104.54714307487238, 37.480710109065285],
@@ -437,13 +453,8 @@ var AOI =
           [105.76210384524832, 37.87746262824495],
           [105.55060229206258, 37.77121874688003],
           [105.57394917114993, 37.71264348706056],
-          [105.50008814361291, 37.63957095794076],
-          [105.44962995432951, 37.64474267530338],
-          [105.44517684147417, 37.605058090576094],
-          [105.4158369442771, 37.590243715954784],
-          [105.39970906712645, 37.590245790723074],
-          [105.38169307619843, 37.599087023972],
-          [105.37142978916175, 37.6491395634904],
+          [105.3885185041342, 37.72788138802402],
+          [105.26774631748206, 37.70620219537559],
           [105.17559959083263, 37.66774415104106],
           [105.09171957778517, 37.627011760951234],
           [105.02590640550804, 37.61922210177834],
@@ -4580,10 +4591,7 @@ var AOI =
            [106.11589179452544, 37.61480700187617],
            [106.11576304849272, 37.6151469472465],
            [106.11413226541167, 37.615214936134066]]]]),
-    desert = 
-    /* color: #f3ff92 */
-    /* shown: false */
-    ee.Geometry({
+    desert = /* color: #f3ff92 */ee.Geometry({
       "type": "GeometryCollection",
       "geometries": [
         {
@@ -7229,10 +7237,7 @@ var AOI =
       ],
       "coordinates": []
     }),
-    mountain = 
-    /* color: #f2b50b */
-    /* shown: false */
-    ee.Geometry({
+    mountain = /* color: #f2b50b */ee.Geometry({
       "type": "GeometryCollection",
       "geometries": [
         {
@@ -7707,8 +7712,8 @@ var AOI =
           "coordinates": [
             [
               [
-                106.51838052744837,
-                39.13258102454644
+                106.55545938487025,
+                39.15814226061599
               ],
               [
                 106.44490945811243,
@@ -8014,10 +8019,7 @@ var AOI =
       ],
       "coordinates": []
     }),
-    urban = 
-    /* color: #d1dad5 */
-    /* shown: false */
-    ee.Geometry({
+    urban = /* color: #d1dad5 */ee.Geometry({
       "type": "GeometryCollection",
       "geometries": [
         {
@@ -8484,7 +8486,6 @@ var AOI =
     yinchuan = 
     /* color: #e9ffa9 */
     /* shown: false */
-    /* locked: true */
     ee.Geometry.Polygon(
         [[[105.85322434594764, 38.25955109466198],
           [105.96858079126014, 38.22935166702704],
@@ -8567,7 +8568,6 @@ var AOI =
     wuzhong = 
     /* color: #0b4a8b */
     /* shown: false */
-    /* locked: true */
     ee.Geometry.Polygon(
         [[[105.84301495992561, 38.24977134766943],
           [105.78671002828499, 38.207698767708294],
@@ -8728,7 +8728,6 @@ var AOI =
     zhongwei = 
     /* color: #ffdaf0 */
     /* shown: false */
-    /* locked: true */
     ee.Geometry.Polygon(
         [[[105.39029974535148, 37.71338663983849],
           [105.27732561799681, 37.679743345567495],
@@ -8890,7 +8889,6 @@ var AOI =
     guyuan = 
     /* color: #00ffff */
     /* shown: false */
-    /* locked: true */
     ee.Geometry.Polygon(
         [[[105.5203182676808, 36.1470910465155],
           [105.50109219346206, 36.11159694518428],
@@ -8952,4 +8950,6 @@ var AOI =
           [105.758431145677, 36.15154985290536],
           [105.66230077458324, 36.14933206793583],
           [105.59088964177074, 36.21583832926743],
-          [105.48102636052074, 36.175941347971076]]]);
+          [105.48102636052074, 36.175941347971076]]]),
+    importedAsset1 = ee.FeatureCollection("projects/ee-hnyhl3/assets/China_PV_training_polygon_2020"),
+    geometry = /* color: #d63000 */ee.Geometry.MultiPoint();
