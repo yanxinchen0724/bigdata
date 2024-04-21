@@ -199,9 +199,13 @@ var density = class0Mask.reduceNeighborhood({
 });
 ```
 
-### VisualizThe application has two main panels. The left panel is the information panel, and the right panel is the map panel, 
+### Visualization
 
-where map layers and legends can be loaded. The initial loading process is as follows:加载过程如下：
+
+The application has two main panels. The left panel is the information panel, and the right panel is the map panel, 
+
+where map layers and legends can be loaded. The initial loading process is as follows:
+
 
 ```js
 var home = function() {
@@ -255,14 +259,16 @@ var home = function() {
 // Call the home function to set up the main interface
 home();
 ```
-1. Left Panel
 
-(1) Line chart showing year-over-year changes in the total area of photovoltaic power stations in Ningxia
-.
-This line chart is created by importing precomputed area data using the ui.Chart.feature.byFeature method
 
-. The horizontal axis represents years, while the vertical axis represents the are
-.、纵轴为面积值。
+#### 1.Left Panel
+
+(1) Line chart showing year-over-year changes in the total area of photovoltaic power stations in Ningxia.
+
+This line chart is created by importing precomputed area data using the ui.Chart.feature. byFeature method.
+
+The horizontal axis represents years, while the vertical axis represents the area.
+
 ```js
 function createLineChart() {
   var years = ee.List.sequence(2000, 2020); // From 2000 to 2020
@@ -289,11 +295,14 @@ function createLineChart() {
     });
   return lineChart;
 }
-var lineChart = createLineChar((2) Yearly changes in the area of photovoltaic power stations in Ningxia's various municipal-level districts.
+var lineChart = createLineChart();
+```
 
-Create a bar chart and embed it in the UI panel. This bar chart can display the area of photovoltaic power station
 
- in five different districts for a specific year份的光伏发电站面积。
+(2) Yearly changes in the area of photovoltaic power stations in Ningxia's various municipal-level districts.
+
+Create a bar chart and embed it in the UI panel. This bar chart can display the area of photovoltaic power stations in five different districts for a specific year.
+
 ```js
 // District names as categories
 var categories = ['Yinchuan', 'Wuzhong', 'Zhongwei', 'Guyuan', 'Shishan'];
@@ -330,15 +339,32 @@ var currentChart = createBarChart('2023 District Photovoltaic Power Station Area
 var chart1_Panel = ui.Panel({
   widgets: [currentChart],
   style: {width: '100%', height: '230px'}
-}(3) Time Slider: Controls the display of different map layers and charts for specific years, allowing users to load data for a given year.
-定年份的图像和图表。
+});
+```
+
+
+
+(3) Time Slider: Controls the display of different map layers and charts for specific years, 
+
+allowing users to load data for a given year.
+
+```js
+
+```
+
 (4) Associated Influence Factors Map:
 
-（4）相关影响因素(5) Navigation Buttons: Includes the "Comparison View" button and the "Main View" button.对比**Comparison View Button**
+```js
 
-Defines a button called comparison_view_button. When clicked, it hides the current legend panel and map panel,
+```
 
- then calls the createOrUpdateDualMapPanels function. This function switches the interface to a comparison view of the map panels.跳转到对比视图地图面板.
+
+(5) Navigation Buttons: Includes the "Comparison View" button and the "Main View" button.
+
+Comparison View Button
+Defines a button called comparison_view_button. When clicked, it hides the current legend panel and map panel, then calls the createOrUpdateDualMapPanels function. 
+
+This function switches the interface to a comparison view of the map panels.
 
 ```js
 var dualMapPanelsCreated = false;
@@ -349,13 +375,19 @@ var comparison_view_button = ui.Button({
     legendPanel.style().set('shown', false);
     mapPanel.style().set('shown', false);
     createOrUpdateDualMapPanels();
-**Main View Button**
+  }
+});
+```
 
-When clicked, this button shows the map panel, custom area panel, and legend panel.
+Main View Button
 
- It allows users to return from the comparison view to the main interface,
+When clicked, this button shows the map panel, custom area panel, and legend panel. 
 
- reverting to a single map view with other interface elements.一地图视图和其它界面元素。
+It allows users to return from the comparison view to the main interface, 
+
+reverting to a single map view with other interface elements.
+
+
 ```js
 var main_interface_button = ui.Button({
   style: { stretch: 'horizontal' }, // Stretch the button horizontally to fill its container
@@ -366,12 +398,13 @@ var main_interface_button = ui.Button({
     mapPanel.style().set('shown', true); // Show the map panel
     legendPanel.style().set('shown', true); // Show the legend panel
   }
-});2. Right-Side Map Panel
+});
+```
 
-(1) Main View Map Pane
-l
-Highlights area boundaries.图地图面板
-高亮显示区域边界
+
+#### 2. Right-Side Map Panel
+(1) Main View Map Panel
+Highlights area boundaries.
 
 ```js
  var highlightLayer;
@@ -419,16 +452,21 @@ Highlights area boundaries.图地图面板
         isFeatureClicked = 0; // Update click status to not realized
         updateInfoPanel('Unknown Area');
       }
-    Pop-Up Information Panel for a Specified Area
+    });
+  });
+```
 
-This code snippet creates and updates an information panel to display detailed information when the user clicks on a region on the map.
 
- The panel's style is set (e.g., size, transparency), and the information is updated based on the user's selection on the map.
+Pop-Up Information Panel for a Specified Area
 
- It also handles unexpected cases when the selected region is out of scope. The information panel displays the district name, area, and unit density.
+This code snippet creates and updates an information panel to display detailed information when the user clicks on a region on the map. 
 
- Each label's value is set using the.setValue method, with dynamic generation based on function parameters and data
-.是基于函数参数和数据动态生成的。
+The panel's style is set (e.g., size, transparency), and the information is updated based on the user's selection on the map. 
+
+It also handles unexpected cases when the selected region is out of scope. The information panel displays the district name, 
+
+area, and unit density. Each label's value is set using the .setValue method, with dynamic generation based on function parameters and data.
+
 ```js
  var infoPanel = ui.Panel({
     style: { width: '130px', position: 'bottom-right' , backgroundColor: 'rgba(255, 255, 255, 1)' }
@@ -453,14 +491,17 @@ function updateInfoPanel(currentSelectedYear, districtName) {
    
     infoPanel.add(ui.Label('District: ', boldStyle).setValue('District: ' + districtName));
     infoPanel.add(ui.Label('Area: ', boldStyle).setValue('Area: ' + regionData.area + ' km²'));
-    infoPanel.add(ui.Label('Density: ', boldStyle).setValue('Density: ' + regionData.density(2) Comparison View Map Panel: Like the main map, this panel allows users to switch between layers for different years, 
+    infoPanel.add(ui.Label('Density: ', boldStyle).setValue('Density: ' + regionData.density));
+  }
+}
 
-enabling comparison from various perspectives.
+```
+
+
+(2) Comparison View Map Panel: Like the main map, this panel allows users to switch between layers for different years, enabling comparison from various perspectives.
 
 Creating the Comparison View
-便用户对比不同视角
 
-对比视图创建
 ```js
 // Right Panel Setup
 var rightyearOptions = ['2019', '2020', '2021', '2022', '2023'];
@@ -491,13 +532,15 @@ var rightyearSelectPanel = ui.Panel({
 var right_legend_Panel = ui.Panel({
   style: {
     position: 'bottom-left',
-    padding: '6px 12pSynchronized Zoom and Movement
-
+    padding: '6px 12px'
+  }
 });
 ```
 
 
-同步缩放移动
+Synchronized Zoom and Movement
+
+
 ```js
 function createOrUpdateDualMapPanels() {
   if (!dualMapPanelsCreated) {
@@ -545,7 +588,7 @@ function syncCenter(map1, map2) {
     map2.setCenter(center);
   };
 }
-```
+````
 
 You can include images:
 
