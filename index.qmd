@@ -649,5 +649,7 @@ function syncZoom(map1, map2) {
 // Function to synchronize the center position between two maps
 function syncCenter(map1, map2) {
   return function(center) {
-    map2.setCenter(cente2_2}{n_2}}}} $$
-
+    map2.setCenter(center);
+  };
+}
+````
