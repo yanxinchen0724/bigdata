@@ -1,5 +1,5 @@
 //Calculate density
-ee.FeatureCollection("projects/solarstationinspection/assets/Ningxia_District");
+var ningxia = ee.FeatureCollection("projects/solarstationinspection/assets/Ningxia_District");
 var feature = ningxia.first(); 
 
 // Print out the names of all properties
