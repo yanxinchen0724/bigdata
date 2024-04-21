@@ -1,5 +1,5 @@
 ---
-title: Identify solar panels in Ningxia
+title: Ningxia Autonomous Region Photovoltaic Power Station Construction Achievements Showcase
 jupyter:
   jupytext:
     text_representation:
@@ -15,29 +15,28 @@ jupyter:
 
 ## Project Summary 
 
-The primary objective of this project is to utilize Google Earth Engine (GEE) to identify potential locations for solar panel installations in Ningxia, China. 
-By analyzing high-resolution Sentinel-2 satellite imagery, the project focuses on classifying land covers with suitable conditions for solar energy production. 
-This initiative supports renewable energy goals, aids in the strategic placement of solar panels, and promotes sustainable development practices.
+Fill in the sections below to provide a brief summary of your project. Each section should have no more than 100 words. Do not edit any of the headings.
 
 ### Problem Statement 
 
+We developed the app to educate and popularize science, aiming to raise public awareness of the construction and development of photovoltaic (PV) power plants in the Ningxia region. This area has unique advantages for developing the PV industry, such as high altitude, ample land, abundant sunlight, and a sparse population. Although many PV power plants are operational, there's a need for a platform that visualizes their exact locations and sizes. Our goal is to create an app that integrates data visualization, interactive features, and relevant environmental factors to showcase the construction outcomes of PV power plants in various municipalities in Ningxia, promoting the adoption of PV energy.
+
 ### End User 
 
-The primary end users are renewable energy companies, government agencies involved in energy and environmental planning, and researchers 
-studying the adoption and impact of renewable energy technologies. These users can leverage the detailed mapping of solar installations 
-to optimize the management and development of solar energy resources.
+We are building this application for the general public, student groups, and individuals interested in renewable energy, with a focus on those visiting urban planning exhibition halls. It addresses the community's need for accessible information about photovoltaic (PV) power plants in the Ningxia region, which has unique advantages for PV development. By providing a platform to visualize the exact locations, development processes, and environmental factors of these PV projects, the app fosters a better understanding of renewable energy. It supports educational activities and interactive learning, thereby increasing public awareness and support for PV energy.
 
 ### Data
 
 Sentinel-2 ImageCollection: High-resolution multi-spectral images that provide detailed information on surface materials and vegetation, critical for distinguishing solar panels. 
 
-SRTM Digital Elevation Model (DEM): Elevation data to help identify and exclude unsuitable areas for solar panels based on terrain steepness [Available Here] (https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003) )
+SRTM Digital Elevation Model (DEM): Elevation data to help identify and exclude unsuitable areas for solar panels based on terrain steepness ([Available Here](https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003) )
+
+NingXia Administrative shapefile from Ningxia Platform for Common Geospatial Information Services ([Available Here](https://ningxia.tianditu.gov.cn/))
 
 
-### Methodolo1. Data Acquisition and Preparation
+### Methodology
 
-The project utilizes Sentinel-2 satellite imagery, selected for its high resolution and broad spectral range, filtering images with under 10% cloud cover for optimal clarity. It focuses on visible, NIR, and SWIR bands crucial for deriving indices like NDVI, NDWI, and NDBI, which identify suitable areas for solar installations by assessing vegetation, water, and urbanization. The terrain is analyzed using SRTM data to exclude steep slopes. A combination of these indices and terrain data helps create a mask to filter out unsuitable areas. Random points are generated and labeled for training a Random Forest classifier, which is validated by metrics like overall accuracy and Kappa to ensure robust model performance.
-
+We use Sentinel-2 satellite imagery, filtered to ensure less than 10% cloud cover, for its high resolution and broad spectral range. By focusing on specific bands (visible, NIR, SWIR), we derive key indices like NDVI, NDWI, and NDBI, to  filter out vegetation, water and urban area. We also use SRTM data to assess terrain, excluding steep slopes. This combination creates a comprehensive mask to filter out unsuitable areas. Random points within suitable regions are used to train a Random Forest classifier, validated with metrics like overall accuracy and confusion matrices for robust performance.
 
 ### Interface
 
@@ -75,12 +74,440 @@ Replace the link below with the link to your application.
 
 Use this section to explain how your application works using code blocks and text explanations (no more than 500 words excluding code):
 
+### Preprocessing
+
+Load images for a specific time period, filter cloudy images
 ```js
-Map.setCenter(35.51898, 33.90153, 15);
+// Define the start and end dates
+var start = '2021-04-01';
+var end = '2021-07-01';
+// Specify the bands of interest
+var bands = ['B2', 'B3', 'B4','B5','B6','B7','B8', 'B8A','B11','B12'];
 
-Map.setOptions("satellite");
+// Load Sentinel-2 ImageCollection, filter by date and cloud percentage, and take the mean
+var sentinel = ee.ImageCollection('COPERNICUS/S2_SR')
+                  .filterBounds(AOI)
+                  .filter(ee.Filter.date(start, end))
+                  .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 1))
+                  .mean()
+                  .select(bands);
+```
 
-var aoi = ee.Geometry.Point(35.51898, 33.90153).buffer(3000);
+compute key indices, and remove some types of landcover with thresholds
+
+```js
+// Update mask based on NDWI and NDVI thresholds and add NDVI band
+var image = sentinel.updateMask(ndwi.lt(0.3)).updateMask(ndvi.lt(0.2)).addBands(ndvi);
+
+// Load SRTM Digital Elevation Model and calculate slope
+var dem = ee.Image('USGS/SRTMGL1_003');
+var slope = ee.Terrain.slope(dem);
+
+// Set a slope threshold to filter out steep areas, e.g., mountains
+var slopeThreshold = 10; // degrees
+
+// Combine NDVI, NDWI, NDBI masks with slope filter
+var combinedMask = ndwi.lt(0.3)
+                        .and(ndvi.lt(0.2))
+                        .and(ndbi.lt(0.1)) // if we want to exclude high NDBI values, indicating urban areas.
+                        .and(slope.lt(slopeThreshold));
+```
+
+### Model Training
+
+
+Training data preparation
+```js
+var solar = ee.FeatureCollection.randomPoints(solar, 1500).map(function(i) {
+  return i.set({'class': 0});
+});
+ 
+var desert = ee.FeatureCollection.randomPoints(desert, 5000).map(function(i) {
+  return i.set({'class': 1});
+});
+ 
+
+var mountain = ee.FeatureCollection.randomPoints(mountain, 3500).map(function(i) {
+  return i.set({'class': 2});
+});
+ 
+var cropland = ee.FeatureCollection.randomPoints(cropland, 2000).map(function(i) {
+  return i.set({'class': 3});
+});
+
+var urban = ee.FeatureCollection.randomPoints(urban, 1500).map(function(i) {
+  return i.set({'class': 4});
+});
+```
+
+Train a random forest classifier
+```js
+var model = ee.Classifier.smileRandomForest({
+  numberOfTrees:700, //improve stability. If computation resources are limited, consider fewer trees.
+  variablesPerSplit: null,
+  minLeafPopulation: 5, //Set a higher value (like 2-5) to avoid overfitting by limiting tree depth
+  bagFraction: 0.5,
+  maxNodes: null
+}).train({
+  features: training,
+  classProperty: 'class'
+});
+```
+
+### Accuracy Validation
+
+```js
+var validated = validation.classify(model);
+var testAccuracy = validated.errorMatrix('class', 'classification');
+
+print('Confusion Matrix ', testAccuracy);
+
+print('Validation overall accuracy: ', testAccuracy.accuracy())
+```
+
+Use a circular kernel to filter pixels based on density threshold
+```js
+var kernel = ee.Kernel.circle({
+  radius: 10,
+  units: 'pixels',
+  normalize: false  // Set to not normalize
+});
+
+var densityThreshold = 45;  // May need further adjustment based on actual conditions
+
+var density = class0Mask.reduceNeighborhood({
+  reducer: ee.Reducer.sum(),
+  kernel: kernel
+});
+```
+
+### VisualizThe application has two main panels. The left panel is the information panel, and the right panel is the map panel, 
+where map layers and legends can be loaded. The initial loading process is as follows:加载过程如下：
+
+```js
+var home = function() {
+  // Clear all child elements of the UI root node
+  ui.root.clear();
+  // Add the large panel to the UI root node
+  ui.root.add(largePanel);
+  // Set the main map's view center to the object specified by variable ningxia, with a zoom level of 7.5
+  mainMap.centerObject(ningxia, 7.5);
+  // Set the map's display type to hybrid (including satellite imagery and street maps)
+  mainMap.setOptions('hybrid');
+  
+  // Add layers to the main map
+  mainMap.addLayer(CO_2023, CO_viz, "CO", false);
+  mainMap.addLayer(NO2_2023, NO2_viz, "NO2", false);
+  mainMap.addLayer(SO2_2023, SO2_viz, "SO2", false);
+  mainMap.addLayer(DSR_2023, DSR_vis, "DSR", false);
+  mainMap.addLayer(LST_2023, LST_Vis, "LST", false);
+  mainMap.addLayer(sentinelRGB, s_rgb, 'Sentinel RGB', true);
+  mainMap.addLayer(Solar_2023, visParams, "Solar", true);
+  mainMap.addLayer(Points_2023, visPoints, "Points", true);
+  
+  // Add the legend panel to the main map
+  mainMap.add(legendPanel);
+  
+  // Style configuration
+  var style = {
+    color: 'red', // The color you want
+    fillColor: '00000000', // Fill color, transparent here
+    width: 1 // Border line width
+  };
+
+  // Initialize feature highlighting functionality on the main map
+  initializeHighlightFeature(ningxia, style, mainMap);
+  
+  // Add widgets to the chart panel
+  chartPanel.add(title);
+  chartPanel.add(intro1);
+  chartPanel.add(stats_label);
+  chartPanel.add(lineChart);
+  chartPanel.add(text_1);
+  chartPanel.add(intro2);
+  chartPanel.add(slider);
+  chartPanel.add(chart1_Panel);
+  chartPanel.add(text_2);
+  chartPanel.add(two_chart_Panel);
+  chartPanel.add(comparison_view_button);
+  chartPanel.add(main_interface_button);
+};
+
+// Call the home function to set up the main interface
+home();
+```
+1. Left Panel
+
+(1) Line chart showing year-over-year changes in the total area of photovoltaic power stations in Ningxia.
+This line chart is created by importing precomputed area data using the ui.Chart.feature.byFeature method
+. The horizontal axis represents years, while the vertical axis represents the are
+.、纵轴为面积值。
+```js
+function createLineChart() {
+  var years = ee.List.sequence(2000, 2020); // From 2000 to 2020
+  var values = years.map(function(year) {
+    return ee.Number(year).multiply(Math.random());
+  });
+
+  var chartFeatures = ee.FeatureCollection([
+    ee.Feature(null, {year: '2019', value: 50}),
+    ee.Feature(null, {year: '2020', value: 70}),
+    ee.Feature(null, {year: '2021', value: 80.36}),
+    ee.Feature(null, {year: '2022', value: 168.5}),
+    ee.Feature(null, {year: '2023', value: 197.83})
+  ]);
+
+  var lineChart = ui.Chart.feature.byFeature(chartFeatures, 'year', 'value')
+    .setOptions({
+      hAxis: {title: 'Year'},
+      vAxis: {title: 'Value'},
+      lineWidth: 1,
+      series: {
+        0: {color: '#3182bd', lineWidth: 3}
+      }
+    });
+  return lineChart;
+}
+var lineChart = createLineChar((2) Yearly changes in the area of photovoltaic power stations in Ningxia's various municipal-level districts.
+Create a bar chart and embed it in the UI panel. This bar chart can display the area of photovoltaic power stations
+ in five different districts for a specific year份的光伏发电站面积。
+```js
+// District names as categories
+var categories = ['Yinchuan', 'Wuzhong', 'Zhongwei', 'Guyuan', 'Shishan'];
+
+// Annual areas of photovoltaic power stations for each district
+var values_2019 = [77.04, 56.50, 38.40, 0, 38.58];
+var values_2020 = [65.40, 48.77, 50.31, 0, 64.17];
+var values_2021 = [34.52, 44.60, 84.09, 0.62, 88.82];
+var values_2022 = [58.22, 59.87, 76.72, 0.05, 73.54];
+var values_2023 = [78.16, 76.26, 134.48, 0.52, 62.04];
+
+// Function to create a bar chart
+function createBarChart(title, values) {
+  return ui.Chart.array.values({
+    array: values,
+    axis: 0,
+    xLabels: categories
+  })
+  .setChartType('BarChart')
+  .setOptions({
+    title: title,
+    hAxis: {title: 'Area (sq km)', minValue: 0},
+    vAxis: {title: 'District'},
+    bar: {groupWidth: '50%'},
+    colors: ['#f3bcbd'],
+    legend: {position: 'none'}
+  });
+}
+
+// Display the chart for 2023 initially
+var currentChart = createBarChart('2023 District Photovoltaic Power Station Areas', values_2023);
+
+// Create a UI panel to display the chart
+var chart1_Panel = ui.Panel({
+  widgets: [currentChart],
+  style: {width: '100%', height: '230px'}
+}(3) Time Slider: Controls the display of different map layers and charts for specific years, allowing users to load data for a given year.
+定年份的图像和图表。
+(4) Associated Influence Factors Map:
+
+（4）相关影响因素(5) Navigation Buttons: Includes the "Comparison View" button and the "Main View" button.对比Comparison View Button
+Defines a button called comparison_view_button. When clicked, it hides the current legend panel and map panel, then calls the createOrUpdateDualMapPanels function. This function switches the interface to a comparison view of the map panels.跳转到对比视图地图面板.
+
+```js
+var dualMapPanelsCreated = false;
+var comparison_view_button = ui.Button({
+  style: {stretch: 'horizontal'},
+  label: 'Comparison View',
+  onClick: function ward_stats_panel() {
+    legendPanel.style().set('shown', false);
+    mapPanel.style().set('shown', false);
+    createOrUpdateDualMapPanels();
+Main View Button
+When clicked, this button shows the map panel, custom area panel, and legend panel. It allows users to return from the comparison view to the main interface,
+ reverting to a single map view with other interface elements.一地图视图和其它界面元素。
+```js
+var main_interface_button = ui.Button({
+  style: { stretch: 'horizontal' }, // Stretch the button horizontally to fill its container
+  label: 'Main View', // Text displayed on the button
+  // Function to execute when the button is clicked
+  onClick: function() {
+    // Show the map panel and other related panels
+    mapPanel.style().set('shown', true); // Show the map panel
+    legendPanel.style().set('shown', true); // Show the legend panel
+  }
+});2. Right-Side Map Panel
+
+(1) Main View Map Panel
+Highlights area boundaries.图地图面板
+高亮显示区域边界
+
+```js
+ var highlightLayer;
+  var isInfoPanelAdded = false;
+
+  // Add click event handler to the map for highlighting clicked regions
+  mapInstance.onClick(function(coords) {
+    // Create a point at the clicked location
+    var point = ee.Geometry.Point([coords.lon, coords.lat]);
+
+    // Find the region under the clicked location
+    var highlight = geojsonFeatureCollection.filterBounds(point);
+  
+    // Ensure the information panel is shown only once
+    infoPanel.style().set('shown', true);
+    infoPanel.clear();
+  
+    // If the info panel has not been added to the map instance, add it
+    if (!isInfoPanelAdded) {
+      mapInstance.add(infoPanel);
+      isInfoPanelAdded = true; // Update the flag to indicate that the info panel has been added
+    }
+
+    // Highlight the selected region
+    if (highlightLayer) {
+      // If a highlight layer already exists, update it
+      highlightLayer.setEeObject(highlight.style({ color: '#FFDBA0' }));
+    } else {
+      // If a highlight layer does not exist, create it and add to the map
+      highlightLayer = mapInstance.addLayer(highlight.style({ color: '#FFDBA0' }), {}, 'Highlighted City');
+    }
+
+    // Retrieve properties from the highlighted feature
+    highlight.evaluate(function(featureCollection) {
+      if (featureCollection.features.length > 0) {
+        console.log('First feature in the collection:', featureCollection.features[0]);
+        // Extract district name from the feature properties
+        var name = featureCollection.features[0].properties.Name;
+        currentDistrictName = name;
+        // Update the info panel to display information about the region
+        isFeatureClicked = 1; 
+        updateInfoPanel(currentSelectedYear, name);
+      } else {
+        // If no feature is selected, update the info panel to show a default message
+        isFeatureClicked = 0; // Update click status to not realized
+        updateInfoPanel('Unknown Area');
+      }
+    Pop-Up Information Panel for a Specified Area
+This code snippet creates and updates an information panel to display detailed information when the user clicks on a region on the map.
+ The panel's style is set (e.g., size, transparency), and the information is updated based on the user's selection on the map.
+ It also handles unexpected cases when the selected region is out of scope. The information panel displays the district name, area, and unit density.
+ Each label's value is set using the.setValue method, with dynamic generation based on function parameters and data
+.是基于函数参数和数据动态生成的。
+```js
+ var infoPanel = ui.Panel({
+    style: { width: '130px', position: 'bottom-right' , backgroundColor: 'rgba(255, 255, 255, 1)' }
+  });
+   infoPanel.style().set('shown', false);
+
+// Function to update the information panel to display details of the clicked region
+function updateInfoPanel(currentSelectedYear, districtName) {
+  console.log(currentSelectedYear, districtName);
+
+  // Display a message if no region is clicked or the clicked region is not within Ningxia Province
+  if (!districtName || !data[currentSelectedYear] || !data[currentSelectedYear][districtName]) {
+    infoPanel.clear();
+    infoPanel.add(ui.Label('No region in Ningxia Province was clicked.'));
+  } else {
+    // If a region within Ningxia Province is clicked and data is found
+    var regionData = data[currentSelectedYear][districtName];
+    // Clear the old data display
+    infoPanel.clear();
+    var boldStyle = {fontWeight: 'bold', color: 'black'};
+    // Add labels to the information panel with the district name, area, and density
+   
+    infoPanel.add(ui.Label('District: ', boldStyle).setValue('District: ' + districtName));
+    infoPanel.add(ui.Label('Area: ', boldStyle).setValue('Area: ' + regionData.area + ' km²'));
+    infoPanel.add(ui.Label('Density: ', boldStyle).setValue('Density: ' + regionData.density(2) Comparison View Map Panel: Like the main map, this panel allows users to switch between layers for different years, enabling comparison from various perspectives.
+
+Creating the Comparison View
+便用户对比不同视角
+
+对比视图创建
+```js
+// Right Panel Setup
+var rightyearOptions = ['2019', '2020', '2021', '2022', '2023'];
+// Create a dropdown menu for selecting the year
+var rightyearSelect = ui.Select({
+  items: rightyearOptions,
+  placeholder: 'Select Year',
+  value: '2023', // Set the default value
+  onChange: function(selected) {
+    updateLayerSubRight(selected);
+    console.log('Selected layer: ' + selected);
+  }
+});
+
+// Create a panel for the dropdown menu
+var rightyearSelectPanel = ui.Panel({
+  widgets: [rightyearSelect],
+  layout: ui.Panel.Layout.flow('horizontal'),
+  style: {
+    position: 'top-left',
+    padding: '2px',
+    backgroundColor: 'rgba(255, 255, 255, 0)', // Set background to transparent
+    border: 'none'
+  }
+});
+
+// Panel for displaying the legend
+var right_legend_Panel = ui.Panel({
+  style: {
+    position: 'bottom-left',
+    padding: '6px 12pSynchronized Zoom and Movement
+
+});
+```
+
+
+同步缩放移动
+```js
+function createOrUpdateDualMapPanels() {
+  if (!dualMapPanelsCreated) {
+    // Initialize the map panels
+    var leftPanel = ui.Panel({widgets: [leftMap], style: {stretch: 'both'}});
+    var rightPanel = ui.Panel({widgets: [rightMap], style: {stretch: 'both'}});
+
+    // Set the map center for both left and right maps
+    leftMap.centerObject(ningxia, 7);
+    rightMap.centerObject(ningxia, 7);
+
+    // Set control visibility for both maps
+    leftMap.setControlVisibility({all: true, zoomControl: false, layerList: true});
+    rightMap.setControlVisibility({all: true, zoomControl: false, layerList: true});
+    
+    // Sync zoom levels between the two maps
+    var leftZoomListenerId = leftMap.onChangeZoom(syncZoom(leftMap, rightMap));
+    var rightZoomListenerId = rightMap.onChangeZoom(syncZoom(rightMap, leftMap));
+
+    // Register listeners to synchronize map centers
+    var leftCenterListenerId = leftMap.onChangeCenter(syncCenter(leftMap, rightMap));
+    var rightCenterListenerId = rightMap.onChangeCenter(syncCenter(rightMap, leftMap));
+
+    // Add the panels to the large panel container
+    largePanel.add(leftPanel);
+    largePanel.add(rightPanel);
+
+    // Mark that the dual map panels have been created
+    dualMapPanelsCreated = true;
+  } else {
+    console.log('Map panels have already been created to avoid duplication.');
+  }
+}
+
+// Function to synchronize the zoom level between two maps
+function syncZoom(map1, map2) {
+  return function(zoom) {
+    map2.setZoom(zoom);
+  };
+}
+
+// Function to synchronize the center position between two maps
+function syncCenter(map1, map2) {
+  return function(center) {
+    map2.setCenter(center);
+  };
+}
 ```
 
 You can include images:
