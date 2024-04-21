@@ -343,14 +343,53 @@ var chart1_Panel = ui.Panel({
 ```
 
 
-
 (3) Time Slider: Controls the display of different map layers and charts for specific years, 
 
-allowing users to load data for a given year.
+Sets up an event listener on a slider that triggers three actions when moved: updating chart, processing position changes, and checking for clicks on a district.
 
 ```js
-
+slider.onSlide(function(value) {
+  // Function to update visuals based on slider input
+  updateVisuals(value);
+  // Function to handle changes in slider position
+  handleSliderChange(value);
+  // Function to check if a district has been clicked
+  checkClickStatus();
+});
 ```
+
+The function updates map layers based on the selected year, automatically displaying photovoltaic stations, density points, and Sentinel-2 imagery. The comparative 
+view also features this functionality for both maps.
+
+```js
+function updateLayerMain(year) {
+  year = parseInt(year); 
+  
+  // Filter images by the selected year
+  var imageCO = imageCollectionCO.filter(ee.Filter.eq('year', year)).first();
+  var imageNO2 = imageCollectionNO2.filter(ee.Filter.eq('year', year)).first();
+  var imageSO2 = imageCollectionSO2.filter(ee.Filter.eq('year', year)).first();
+  var imageDSR = imageCollectionDSR.filter(ee.Filter.eq('year', year)).first();
+  var imageLST = imageCollectionLST.filter(ee.Filter.eq('year', year)).first();
+  var imageListSolar = imageCollectionSolar.filter(ee.Filter.eq('year', year)).first();
+  var featurePoints = featureCollectionList[year - 2019];
+  var result = ImageProcessing.processImage(year);
+  var sentinelRGB = result.sentinelRGB;
+  
+  // Set layers with respective visual parameters
+  mainMap.layers().set(0, ui.Map.Layer(sentinelRGB, s_rgb, 'Sentinel RGB', true));
+  mainMap.layers().set(1, ui.Map.Layer(imageCO, CO_vis, "CO",false));
+  mainMap.layers().set(2, ui.Map.Layer(imageNO2, NO2_vis, "NO2",false));
+  mainMap.layers().set(3, ui.Map.Layer(imageSO2, SO2_vis, "SO2",false));
+  mainMap.layers().set(4, ui.Map.Layer(imageDSR, DSR_vis, "DSR", false));
+  mainMap.layers().set(5, ui.Map.Layer(imageLST, LST_Vis, "LST", false));
+  mainMap.layers().set(6, ui.Map.Layer(imageListSolar, visParams, "Predicted photovoltaic station", true));
+  mainMap.layers().set(7, ui.Map.Layer(featurePoints, visPoints, "Points", true));
+}
+```
+
+
+
 
 (4) Associated Influence Factors Map:
 
