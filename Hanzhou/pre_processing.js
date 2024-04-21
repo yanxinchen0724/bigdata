@@ -1,6 +1,4 @@
 //---Pre_processing-----
-Map.addLayer(importedAsset1, {color: 'red'}, 'Imported Data1');
-  
 
 // Set the map center to a location in Ningxia
 Map.setCenter(106.253352, 38.461084, 9); 
@@ -137,7 +135,7 @@ Map.addLayer(solar.clip(AOI), {palette: 'red'}, 'Predicted Solar Panels',false, 
 Export.classifier.toAsset({
   classifier: model,
   description: 'exported_19_23',
-  assetId: 'projects/ee-hnyhl3/assets/classifier2019'
+  assetId: 'projects/ee-hnyhl3/assets/classifier2022'
 });
 */
 
