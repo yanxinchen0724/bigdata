@@ -88,13 +88,14 @@ Replace the link below with the link to your application.
 <iframe src='https://ollielballinger.users.earthengine.app/view/turkey-earthquake' width='100%' height='700px'></iframe>
 
 :::
-## How it Works 
 
-Use this section to explain how your application works using code blocks and text explanations (no more than 500 words excluding code):
+
+## How it Works 
 
 ### Preprocessing
 
-Load images for a specific time period, filter cloudy images
+1.Load images for a specific time period, filter cloudy images
+
 ```js
 // Define the start and end dates
 var start = '2021-04-01';
@@ -111,7 +112,7 @@ var sentinel = ee.ImageCollection('COPERNICUS/S2_SR')
                   .select(bands);
 ```
 
-compute key indices, and remove some types of landcover with thresholds
+2.Compute key indices, and remove some types of landcover with thresholds
 
 ```js
 // Update mask based on NDWI and NDVI thresholds and add NDVI band
@@ -133,8 +134,8 @@ var combinedMask = ndwi.lt(0.3)
 
 ### Model Training
 
+1.Training data preparation
 
-Training data preparation
 ```js
 var solar = ee.FeatureCollection.randomPoints(solar, 1500).map(function(i) {
   return i.set({'class': 0});
@@ -144,7 +145,6 @@ var desert = ee.FeatureCollection.randomPoints(desert, 5000).map(function(i) {
   return i.set({'class': 1});
 });
  
-
 var mountain = ee.FeatureCollection.randomPoints(mountain, 3500).map(function(i) {
   return i.set({'class': 2});
 });
@@ -158,7 +158,8 @@ var urban = ee.FeatureCollection.randomPoints(urban, 1500).map(function(i) {
 });
 ```
 
-Train a random forest classifier
+2.Train a random forest classifier
+
 ```js
 var model = ee.Classifier.smileRandomForest({
   numberOfTrees:700, //improve stability. If computation resources are limited, consider fewer trees.
@@ -174,16 +175,18 @@ var model = ee.Classifier.smileRandomForest({
 
 ### Accuracy Validation
 
+1.Calculates the confusion matrix, and prints the overall accuracy to evaluate the performance.
+
 ```js
 var validated = validation.classify(model);
 var testAccuracy = validated.errorMatrix('class', 'classification');
 
 print('Confusion Matrix ', testAccuracy);
-
 print('Validation overall accuracy: ', testAccuracy.accuracy())
 ```
 
-Use a circular kernel to filter pixels based on density threshold
+2.Use a circular kernel to filter pixels based on density threshold
+
 ```js
 var kernel = ee.Kernel.circle({
   radius: 10,
@@ -201,11 +204,10 @@ var density = class0Mask.reduceNeighborhood({
 
 ### Visualization
 
-
 The application has two main panels. The left panel is the information panel, and the right panel is the map panel, 
-
 where map layers and legends can be loaded. The initial loading process is as follows:
 
+Call the home function to set up the main interface
 
 ```js
 var home = function() {
@@ -255,19 +257,14 @@ var home = function() {
   chartPanel.add(comparison_view_button);
   chartPanel.add(main_interface_button);
 };
-
-// Call the home function to set up the main interface
 home();
 ```
 
+#### 1.Information panel
 
-#### 1.Left Panel
-
-(1) Line chart showing year-over-year changes in the total area of photovoltaic power stations in Ningxia.
-
-This line chart is created by importing precomputed area data using the ui.Chart.feature. byFeature method.
-
-The horizontal axis represents years, while the vertical axis represents the area.
+(1) Line chart showing year-over-year changes in the total area of photovoltaic power stations in Ningxia.This line chart 
+is created by importing precomputed area data using the ui.Chart.feature. byFeature method.The horizontal axis represents
+ years, while the vertical axis represents the area.
 
 ```js
 function createLineChart() {
@@ -275,7 +272,6 @@ function createLineChart() {
   var values = years.map(function(year) {
     return ee.Number(year).multiply(Math.random());
   });
-
   var chartFeatures = ee.FeatureCollection([
     ee.Feature(null, {year: '2019', value: 50}),
     ee.Feature(null, {year: '2020', value: 70}),
@@ -298,10 +294,9 @@ function createLineChart() {
 var lineChart = createLineChart();
 ```
 
-
-(2) Yearly changes in the area of photovoltaic power stations in Ningxia's various municipal-level districts.
-
-Create a bar chart and embed it in the UI panel. This bar chart can display the area of photovoltaic power stations in five different districts for a specific year.
+(2) Yearly changes in the area of photovoltaic power stations in Ningxia's various municipal-level districts.Create a bar 
+chart and embed it in the UI panel. This bar chart can display the area of photovoltaic power stations in five different 
+districts for a specific year.
 
 ```js
 // District names as categories
@@ -331,7 +326,6 @@ function createBarChart(title, values) {
     legend: {position: 'none'}
   });
 }
-
 // Display the chart for 2023 initially
 var currentChart = createBarChart('2023 District Photovoltaic Power Station Areas', values_2023);
 
@@ -342,10 +336,8 @@ var chart1_Panel = ui.Panel({
 });
 ```
 
-
-(3) Time Slider: Controls the display of different map layers and charts for specific years, 
-
-Sets up an event listener on a slider that triggers three actions when moved: updating chart, processing position changes, and checking for clicks on a district.
+(3) Time Slider: Controls the display of different map layers and charts for specific years, Sets up an event listener on 
+a slider that triggers three actions when moved: updating chart, processing position changes, and checking for clicks on a district.
 
 ```js
 slider.onSlide(function(value) {
@@ -358,8 +350,8 @@ slider.onSlide(function(value) {
 });
 ```
 
-The function updates map layers based on the selected year, automatically displaying photovoltaic stations, density points, and Sentinel-2 imagery. The comparative 
-view also features this functionality for both maps.
+Updates map layers based on the selected year, automatically displaying photovoltaic stations, density points, and Sentinel-2 imagery. 
+The comparative view also features this functionality for both maps.
 
 ```js
 function updateLayerMain(year) {
@@ -388,22 +380,63 @@ function updateLayerMain(year) {
 }
 ```
 
-
-
-
 (4) Associated Influence Factors Map:
+The format of the chart is set here, the data is sorted from large to small according to the year, and then the corresponding bar chart 
+with different lengths is generated to show the difference between the data. At the end, the complete bar chart is generated, given different
+ colors, and displayed horizontally on the interface.
 
 ```js
+var statsLabelStyle = {fontWeight: 'bold', fontSize: '16px', margin: '10px 0 0 0'};
+var text_2 = ui.Label('3. Related Influencing Factors', statsLabelStyle);
+// create an empty label
+var spacer = ui.Label(' ', {margin: '10px 0'});
+var spacer1 = ui.Label(' ', {margin: '10px 0'});
+var chartsPanel = ui.Panel({
+      layout: ui.Panel.Layout.flow('horizontal'),
+});
 
+// Define a function to generate a sorted horizontal bar chart
+function createAndAddSortedBarChart(featureCollection, levelType, year, panel) {
+  var selectedData = featureCollection
+    .filter(ee.Filter.eq('Level', levelType))
+    .select(['Area', year]);
+
+  var sortedData = selectedData.sort(year, false);
+  var chart = ui.Chart.feature.byFeature({
+    features: sortedData,
+    xProperty: 'Area',
+    yProperties: [year]
+  })
+  .setChartType('BarChart')
+  .setOptions({
+    title: levelType + ' Ranking of Surface Radiation in ' + year,
+    hAxis: {title: 'Surface Radiation (w/m^2)'},
+    vAxis: {title: levelType, textStyle: {fontSize: 10}, showTextEvery: 1},
+    bars: 'horizontal',
+    chartArea: {width: '65%', height: '60%'}, 
+    series: {0: {color: '#3182bd'}},
+    legend: {position: 'none'}
+  });
+
+  // add chart to panel
+  panel.add(chart);
+}
+
+// Define list of years
+var years = ['2019', '2020', '2021', '2022', '2023'];
+
+// Generate horizontal bar charts for each year and level and add them to the panel
+years.forEach(function(year) {
+  createAndAddSortedBarChart(table, 'City', year, chartsPanel);
+  createAndAddSortedBarChart(table, 'District', year, chartsPanel);
+});
 ```
-
 
 (5) Navigation Buttons: Includes the "Comparison View" button and the "Main View" button.
 
-Comparison View Button
-Defines a button called comparison_view_button. When clicked, it hides the current legend panel and map panel, then calls the createOrUpdateDualMapPanels function. 
-
-This function switches the interface to a comparison view of the map panels.
+Comparison View Button：
+Defines a button called comparison_view_button. When clicked, it hides the current legend panel and map panel, then calls the 
+createOrUpdateDualMapPanels function. This function switches the interface to a comparison view of the map panels.
 
 ```js
 var dualMapPanelsCreated = false;
@@ -418,14 +451,9 @@ var comparison_view_button = ui.Button({
 });
 ```
 
-Main View Button
-
-When clicked, this button shows the map panel, custom area panel, and legend panel. 
-
-It allows users to return from the comparison view to the main interface, 
-
-reverting to a single map view with other interface elements.
-
+Main View Button：
+When clicked, this button shows the map panel, custom area panel, and legend panel. It allows users to return from the comparison 
+view to the main interface, reverting to a single map view with other interface elements.
 
 ```js
 var main_interface_button = ui.Button({
@@ -440,10 +468,10 @@ var main_interface_button = ui.Button({
 });
 ```
 
-
 #### 2. Right-Side Map Panel
 (1) Main View Map Panel
-Highlights area boundaries.
+Highlights area：attaches a click event handler to a map to highlight regions and display an information panel. It updates or creates a highlight 
+layer based on user clicks and populates the panel with region details or handles cases where no region is clicked.
 
 ```js
  var highlightLayer;
@@ -495,25 +523,16 @@ Highlights area boundaries.
   });
 ```
 
-
 Pop-Up Information Panel for a Specified Area
-
-This code snippet creates and updates an information panel to display detailed information when the user clicks on a region on the map. 
-
-The panel's style is set (e.g., size, transparency), and the information is updated based on the user's selection on the map. 
-
-It also handles unexpected cases when the selected region is out of scope. The information panel displays the district name, 
-
-area, and unit density. Each label's value is set using the .setValue method, with dynamic generation based on function parameters and data.
+Sets up an information panel that updates to display details such as district name, area, and unit density when a user clicks on a map region.
 
 ```js
  var infoPanel = ui.Panel({
     style: { width: '130px', position: 'bottom-right' , backgroundColor: 'rgba(255, 255, 255, 1)' }
   });
    infoPanel.style().set('shown', false);
-
-// Function to update the information panel to display details of the clicked region
 function updateInfoPanel(currentSelectedYear, districtName) {
+  // Function to update the information panel to display details of the clicked region
   console.log(currentSelectedYear, districtName);
 
   // Display a message if no region is clicked or the clicked region is not within Ningxia Province
@@ -533,11 +552,10 @@ function updateInfoPanel(currentSelectedYear, districtName) {
     infoPanel.add(ui.Label('Density: ', boldStyle).setValue('Density: ' + regionData.density));
   }
 }
-
 ```
 
-
-(2) Comparison View Map Panel: Like the main map, this panel allows users to switch between layers for different years, enabling comparison from various perspectives.
+(2) Comparison View Map Panel: Like the main map, this panel allows users to switch between layers for different years, 
+enabling comparison from various perspectives.
 
 Creating the Comparison View
 
@@ -554,6 +572,7 @@ var rightyearSelect = ui.Select({
     console.log('Selected layer: ' + selected);
   }
 });
+```
 
 // Create a panel for the dropdown menu
 var rightyearSelectPanel = ui.Panel({
@@ -576,9 +595,9 @@ var right_legend_Panel = ui.Panel({
 });
 ```
 
-
 Synchronized Zoom and Movement
-
+Sets up synchronized dual map panels if not already created, configuring shared zoom levels and center positions between two maps
+for cohesive viewing. It initializes map settings and controls visibility.
 
 ```js
 function createOrUpdateDualMapPanels() {
@@ -629,10 +648,4 @@ function syncCenter(map1, map2) {
 }
 ````
 
-You can include images:
-
-![Pixelwise T-Test, 2018](images/beirut_change_2020.jpg)
-
-and math:
-$$ \Large t = {\frac{\overline{x_1}-\overline{x_2}} {\sqrt{\frac{s^2_1}{n_1} + \frac{s^2_2}{n_2}}}} $$
 
