@@ -130,17 +130,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="project-summary">Project Summary</h2>
 <section id="problem-statement" class="level3">
 <h3 class="anchored" data-anchor-id="problem-statement">Problem Statement</h3>
-<p>We developed the app to educate and popularize science, aiming to raise public awareness of the construction and development of photovoltaic (PV) power plants in the Ningxia region.</p>
-<p>This area has unique advantages for developing the PV industry, such as high altitude, ample land, abundant sunlight, and a sparse population. Although many PV power plants are operational,</p>
-<p>there’s a need for a platform that visualizes their exact locations and sizes. Our goal is to create an app that integrates data visualization,</p>
-<p>interactive features, and relevant environmental factors to showcase the construction outcomes of PV power plants in various municipalities in Ningxia, promoting the adoption of PV energy.</p>
+<p>We developed the app to educate and popularize science, aiming to raise public awareness of the construction and development of photovoltaic (PV) power plants in the Ningxia region. This area has unique advantages for developing the PV industry, such as high altitude, ample land, abundant sunlight, and a sparse population. Although many PV power plants are operational, there’s a need for a platform that visualizes their exact locations and sizes. Our goal is to create an app that integrates data visualization, interactive features, and relevant environmental factors to showcase the construction outcomes of PV power plants in various municipalities in Ningxia, promoting the adoption of PV energy.</p>
 </section>
 <section id="end-user" class="level3">
 <h3 class="anchored" data-anchor-id="end-user">End User</h3>
-<p>We are building this application for the general public, student groups, and individuals interested in renewable energy, with a focus on those visiting urban planning exhibition halls.</p>
-<p>It addresses the community’s need for accessible information about photovoltaic (PV) power plants in the Ningxia region, which has unique advantages for PV development.</p>
-<p>By providing a platform to visualize the exact locations, development processes, and environmental factors of these PV projects, the app fosters a better understanding of renewable energy.</p>
-<p>It supports educational activities and interactive learning, thereby increasing public awareness and support for PV energy.</p>
+<p>We are building this application for the general public, student groups, and individuals interested in renewable energy, with a focus on those visiting urban planning exhibition halls. It addresses the community’s need for accessible information about photovoltaic (PV) power plants in the Ningxia region, which has unique advantages for PV development. By providing a platform to visualize the exact locations, development processes, and environmental factors of these PV projects, the app fosters a better understanding of renewable energy. It supports educational activities and interactive learning, thereby increasing public awareness and support for PV energy.</p>
 </section>
 <section id="data" class="level3">
 <h3 class="anchored" data-anchor-id="data">Data</h3>
@@ -160,16 +154,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="interface" class="level3">
 <h3 class="anchored" data-anchor-id="interface">Interface</h3>
 <ol type="1">
-<li><p>Main view: Display information based on the latest data. Users can select each layer and adjust the transparency in the Layers section to customise the information they want to present. <img src="images/Main View.png" class="img-fluid" alt="pic1"></p></li>
-<li><p>Comparison view: Divide into the left and right interfaces. Users can customise the years and select layers to view the information for comparison. <img src="images/Comparison View.png" class="img-fluid" alt="pic2"></p></li>
-<li><p>Data visualization interface: Include the title and introduction of the app, present the changing trend of Ningxia PV Station and related factors (Surface Radiation and Land Surface Temperature) in the past five years through charts, and ranks and values distinguished by city and district. <img src="images/Data visualisation interface.png" class="img-fluid" alt="pic3"></p></li>
+<li>Main view: Display information based on the latest data. Users can select each layer and adjust the transparency in the Layers section to customise the information they want to present.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://raw.githubusercontent.com/yanxinchen0724/bigdata/main/images/Main%20View.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image</figcaption>
+</figure>
+</div>
+<ol start="2" type="1">
+<li><p>Comparison view: Divide into the left and right interfaces. Users can customise the years and select layers to view the information for comparison )<img src="https://raw.githubusercontent.com/yanxinchen0724/bigdata/main/images/ComparisonView.png" class="img-fluid" alt="image"></p></li>
+<li><p>Data visualization interface: Include the title and introduction of the app, present the changing trend of Ningxia PV Station and related factors (Surface Radiation and Land Surface Temperature) in the past five years through charts, and ranks and values distinguished by city and district .<img src="https://raw.githubusercontent.com/yanxinchen0724/bigdata/main/images/Datavisualisationinterface.png" class="img-fluid" alt="image"></p></li>
 </ol>
 </section>
 </section>
 <section id="the-application" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="the-application">The Application</h2>
 <div class="column-page">
-<iframe src="https://solarstationinspection.projects.earthengine.app/view/photovoltaic-power-station" width="100%" height="700px">
+<iframe src="https://solarstationinspection.projects.earthengine.app/view/photovoltaic-power-station-in-ningxia" width="120%" height="825px">
 </iframe>
 </div>
 </section>
@@ -385,8 +387,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>  <span class="dt">style</span><span class="op">:</span> {<span class="dt">width</span><span class="op">:</span> <span class="st">'100%'</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="st">'230px'</span>}</span>
 <span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ol start="3" type="1">
-<li>Time Slider: Controls the display of different map layers and charts for specific years, Sets up an event listener on a slider that triggers three actions when moved: updating chart, processing position changes, and checking for clicks on a district.</li>
+<li>Time Slider</li>
 </ol>
+<p>Controls the display of different map layers and charts for specific years, sets up an event listener on a slider that triggers three actions when moved: updating chart, processing position changes, and checking for clicks on a district.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>slider<span class="op">.</span><span class="fu">onSlide</span>(<span class="kw">function</span>(value) {</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Function to update visuals based on slider input</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">updateVisuals</span>(value)<span class="op">;</span></span>
@@ -471,7 +474,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol start="5" type="1">
 <li>Navigation Buttons: Includes the “Comparison View” button and the “Main View” button.</li>
 </ol>
-<p>Comparison View Button：</p>
+<p>Comparison View Button:</p>
 <p>Defines a button called comparison_view_button. When clicked, it hides the current legend panel and map panel, then calls the createOrUpdateDualMapPanels function. This function switches the interface to a comparison view of the map panels.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> dualMapPanelsCreated <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> comparison_view_button <span class="op">=</span> ui<span class="op">.</span><span class="fu">Button</span>({</span>
@@ -483,7 +486,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">createOrUpdateDualMapPanels</span>()<span class="op">;</span></span>
 <span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Main View Button： When clicked, this button shows the map panel, custom area panel, and legend panel. It allows users to return from the comparison view to the main interface, reverting to a single map view with other interface elements.</p>
+<p>Main View Button：</p>
+<p>When clicked, this button shows the map panel, custom area panel, and legend panel. It allows users to return from the comparison view to the main interface, reverting to a single map view with other interface elements.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> main_interface_button <span class="op">=</span> ui<span class="op">.</span><span class="fu">Button</span>({</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">style</span><span class="op">:</span> { <span class="dt">stretch</span><span class="op">:</span> <span class="st">'horizontal'</span> }<span class="op">,</span> <span class="co">// Stretch the button horizontally to fill its container</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">label</span><span class="op">:</span> <span class="st">'Main View'</span><span class="op">,</span> <span class="co">// Text displayed on the button</span></span>
